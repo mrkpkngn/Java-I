@@ -2,11 +2,14 @@ package com.task.controller;
 
 import java.awt.GridLayout;
 import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+
 import java.awt.event.*;
 import java.util.Vector;
 import javax.swing.table.DefaultTableModel;
 
-import com.task.service.TaskService; 
+import com.task.service.TaskService;
 import com.task.model.TaskItem;
 import com.task.model.TaskStatus;
 
@@ -35,7 +38,7 @@ public class TaskItemGUI extends JFrame {
         setSize(900, 600);
 
         tableModel = new DefaultTableModel(columnNames, 0);
-        
+
         for (TaskItem taskItem : _service.getAllTasks()) {
             Object[] row = {
                     taskItem.getId(),
@@ -49,6 +52,26 @@ public class TaskItemGUI extends JFrame {
 
         taskItemTable = new JTable(tableModel);
         JScrollPane scrollPane = new JScrollPane(taskItemTable);
+
+        taskItemTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent event) {
+                if (!event.getValueIsAdjusting() && taskItemTable.getSelectedRow() != -1) {
+
+                    int selectedRow = taskItemTable.getSelectedRow();
+
+                    String title = taskItemTable.getModel().getValueAt(selectedRow, 1).toString();
+                    String dueDate = taskItemTable.getModel().getValueAt(selectedRow, 2).toString();
+                    TaskStatus status = (TaskStatus) taskItemTable.getModel().getValueAt(selectedRow, 3);
+                    String email = taskItemTable.getModel().getValueAt(selectedRow, 4).toString();
+
+                    titleField.setText(title);
+                    dateField.setText(dueDate);
+                    statusBox.setSelectedItem(status);
+                    emailField.setText(email);
+                }
+            }
+        });
 
         JPanel south = new JPanel(new GridLayout(5, 2, 3, 3));
 
@@ -124,15 +147,109 @@ public class TaskItemGUI extends JFrame {
 
         exitButton.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent e){
+            public void actionPerformed(ActionEvent e) {
                 System.exit(0);
             }
         });
 
-        addWindowListener(new WindowAdapter(){
+        addWindowListener(new WindowAdapter() {
             @Override
-            public void windowClosing(WindowEvent e){
+            public void windowClosing(WindowEvent e) {
                 System.exit(0);
+            }
+        });
+
+        updateButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int selectedRow = taskItemTable.getSelectedRow();
+
+                if (selectedRow == -1) {
+                    JOptionPane.showMessageDialog(TaskItemGUI.this,
+                            "Please select a task to update.", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                int id = (int) taskItemTable.getModel().getValueAt(selectedRow, 0);
+
+                String title = getTitleField();
+                if (title.isEmpty()) {
+                    JOptionPane.showMessageDialog(TaskItemGUI.this,
+                            "Title cannot be empty.", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                String dueDate = getDateField();
+                if (dueDate.isEmpty()) {
+                    JOptionPane.showMessageDialog(TaskItemGUI.this,
+                            "Due Date cannot be empty.", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                TaskStatus taskStatus = getStatusBox();
+                String email = getEmailField();
+                if (email.isEmpty()) {
+                    JOptionPane.showMessageDialog(TaskItemGUI.this,
+                            "Email cannot be empty.", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                TaskItem updatedTask = _service.updateTask(id, title, dueDate, taskStatus, email);
+
+                if (updatedTask != null) {
+                    tableModel.setValueAt(updatedTask.getTitle(), selectedRow, 1);
+                    tableModel.setValueAt(updatedTask.getdueDate(), selectedRow, 2);
+                    tableModel.setValueAt(updatedTask.getTaskStatus(), selectedRow, 3);
+                    tableModel.setValueAt(updatedTask.getEmail(), selectedRow, 4);
+                    clearFields();
+                } else {
+                    JOptionPane.showMessageDialog(TaskItemGUI.this,
+                            "Task update failed.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+
+        deleteButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int selectedRow = taskItemTable.getSelectedRow();
+
+                if (selectedRow == -1) {
+                    JOptionPane.showMessageDialog(TaskItemGUI.this,
+                            "Please select a task to update.", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                int id = (int) taskItemTable.getModel().getValueAt(selectedRow, 0);
+
+                boolean success = _service.deleteTask(id);
+
+                if (success) {
+                    tableModel.removeRow(selectedRow);
+                } else {
+                    JOptionPane.showMessageDialog(TaskItemGUI.this,
+                            "Task deletion failed.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+
+        reloadButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                _service.reloadTasks();
+
+                tableModel.setRowCount(0);
+
+                for (TaskItem taskItem : _service.getAllTasks()) {
+                    Object[] row = {
+                            taskItem.getId(),
+                            taskItem.getTitle(),
+                            taskItem.getdueDate(),
+                            taskItem.getTaskStatus(),
+                            taskItem.getEmail(),
+                    };
+                    tableModel.addRow(row);
+                }
+
+                clearFields();
             }
         });
     }

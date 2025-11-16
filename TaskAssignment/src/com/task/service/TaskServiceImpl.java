@@ -28,4 +28,32 @@ public class TaskServiceImpl implements TaskService {
     public Vector<TaskItem> getAllTasks(){
         return _repo.findAll();
     }
+
+    @Override
+    public TaskItem updateTask(int id, String title, String duedate, TaskStatus taskStatus, String email){
+        TaskItem selectedTask = _repo.findById(id);
+        if(selectedTask != null){
+            selectedTask.setTitle(title);
+            selectedTask.setDueDate(duedate);
+            selectedTask.setTaskStatus(taskStatus);
+            selectedTask.setEmail(email);
+            return _repo.save(selectedTask);
+        }
+
+        return null;
+    }
+
+    @Override
+    public Boolean deleteTask(int id){
+        TaskItem selectedTask = _repo.findById(id);
+        if(selectedTask != null){
+            return _repo.delete(selectedTask);
+        }
+        return false;
+    }
+
+    @Override
+    public void reloadTasks(){
+        _repo.reload();
+    }
 }

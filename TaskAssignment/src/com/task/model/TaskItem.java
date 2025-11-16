@@ -38,6 +38,22 @@ public class TaskItem implements Serializable {
         return this._email;
     }
 
+    public void setTitle(String title){
+        this._title = title;
+    }
+
+    public void setDueDate(String dueDate){
+        this._dueDate = dueDate;
+    }
+
+    public void setTaskStatus(TaskStatus taskStatus){
+        this._taskStatus = taskStatus;
+    }
+
+    public void setEmail(String email){
+        this._email = email;
+    }
+
     @Override
     public String toString(){
         return "TaskItem{id=" + this._id + ", title='" + this._title +"', dueDate='" + this._dueDate + "', taskStatus='"  + this._taskStatus + "', email='" + this._email + "'}";
