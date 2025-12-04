@@ -25,12 +25,27 @@ public class FileTaskRepository implements TaskRepository {
 
     public FileTaskRepository() {
         this._taskItems = new Vector<TaskItem>();
-        this._totalTaskItems = 0;
         try {
             _connection = DriverManager.getConnection(_url, _username, _password);
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
+        String query = "SELECT MAX(id) AS max_id FROM tasks";
+        try{
+            PreparedStatement stmt = _connection.prepareStatement(query);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                this._totalTaskItems = rs.getInt("max_id");
+            } else {
+                this._totalTaskItems = 0;
+            }
+        }
+        catch (SQLException e){
+            e.printStackTrace();
+        }
+
+        System.out.println("Current max ID from DB: " + this._totalTaskItems);
 
         loadTaskFromDB();
     }
