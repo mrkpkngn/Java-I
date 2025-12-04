@@ -23,11 +23,27 @@ public class DBTaskRepository implements TaskRepository{
         this._taskItems = new Vector<TaskItem>();
         try {
             _connection = DriverManager.getConnection(_url, _username, _password);
-            PreparedStatement stmt = _connection.prepareStatement("");
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
+        String query ="Select Max(id) as Max_id from task ";
+        try {
+            PreparedStatement stmt =_connection.prepareStatement(query);
+            ResultSet rs= stmt.executeQuery();
+            if (rs.next()){
+                this._totalTaskItems=rs.getInt("Max_id");
+            } else {
+                this._totalTaskItems=0;
+            }
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
+        System.out.println("Total Task Items : " + this._totalTaskItems  );
      }
+
+    
+
 
     @Override
     public TaskItem findById(int id) {
