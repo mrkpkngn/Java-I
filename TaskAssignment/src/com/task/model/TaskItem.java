@@ -17,6 +17,14 @@ public class TaskItem implements Serializable {
         this._email = email;
     }
 
+        public TaskItem(String title, String duedate, TaskStatus taskStatus, String email){
+        this._id = 0;
+        this._title = title;
+        this._dueDate = duedate;
+        this._taskStatus = taskStatus;
+        this._email = email;
+    }
+
     //Getters
     public int getId(){
         return this._id;
@@ -36,6 +44,10 @@ public class TaskItem implements Serializable {
 
     public String getEmail(){
         return this._email;
+    }
+
+    public void setId(int id){
+        this._id = id;
     }
 
     public void setTitle(String title){

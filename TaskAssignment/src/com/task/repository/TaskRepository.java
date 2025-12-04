@@ -7,6 +7,8 @@ import java.util.Vector;
 public interface TaskRepository {
     TaskItem findById(int id);
     Vector<TaskItem> findAll();
+    TaskItem update(TaskItem taskItem);
+    TaskItem create(TaskItem taskItem);
     TaskItem save(TaskItem taskItem);
     boolean delete(TaskItem taskItem);
     int getNextID();

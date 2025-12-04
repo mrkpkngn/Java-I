@@ -14,9 +14,8 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public TaskItem createTask(String title, String duedate, TaskStatus taskStatus, String email){
-        int newId = _repo.getNextID();
-        TaskItem newTask = new TaskItem(newId, title, duedate, taskStatus, email);
-        return _repo.save(newTask);
+        TaskItem newTask = new TaskItem(title, duedate, taskStatus, email);
+        return _repo.create(newTask);
     }
 
     @Override
@@ -37,7 +36,7 @@ public class TaskServiceImpl implements TaskService {
             selectedTask.setDueDate(duedate);
             selectedTask.setTaskStatus(taskStatus);
             selectedTask.setEmail(email);
-            return _repo.save(selectedTask);
+            return _repo.update(selectedTask);
         }
 
         return null;

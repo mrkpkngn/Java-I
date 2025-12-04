@@ -45,7 +45,7 @@ public class FileTaskRepository implements TaskRepository {
             e.printStackTrace();
         }
 
-        System.out.println("Current max ID from DB: " + this._totalTaskItems);
+        System.out.println(this._totalTaskItems);
 
         loadTaskFromDB();
     }
@@ -153,5 +153,17 @@ public class FileTaskRepository implements TaskRepository {
         catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public TaskItem update(TaskItem taskItem) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'update'");
+    }
+
+    @Override
+    public TaskItem create(TaskItem taskItem) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'create'");
     }
 }

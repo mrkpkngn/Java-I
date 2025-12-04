@@ -16,6 +16,18 @@
             "name" : "Run Main App",
             "request" : "launch",
             "mainClass": "App"
+        },
+        {
+            "type" : "java",
+            "name" : "Run QueryTry App",
+            "request" : "launch",
+            "mainClass": "QueryTry"
+        },
+        {
+            "type" : "java",
+            "name" : "Run InsertQuery App",
+            "request" : "launch",
+            "mainClass": "InsertQuery"
         }
     ]
 }
