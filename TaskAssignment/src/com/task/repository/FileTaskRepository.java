@@ -8,16 +8,31 @@ import java.io.ObjectOutputStream;
 import java.util.Vector;
 import com.task.model.TaskItem;
 import com.task.model.TaskStatus;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.ResultSet;
+import java.sql.PreparedStatement;
 
 public class FileTaskRepository implements TaskRepository {
     private Vector<TaskItem> _taskItems;
     private int _totalTaskItems;
+    private String _url = "jdbc:mysql://vsrvfeia0h-64.vsb.cz:3306/user_tasks_db";
+    private String _username = "guest";
+    private String _password = "guest_password"; 
+    private Connection _connection;
     private static final String FILENAME = "tasks.ser";
 
     public FileTaskRepository() {
         this._taskItems = new Vector<TaskItem>();
         this._totalTaskItems = 0;
-        loadTasksFromFile();
+        try {
+            _connection = DriverManager.getConnection(_url, _username, _password);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        loadTaskFromDB();
     }
 
     @Override
@@ -102,6 +117,26 @@ public class FileTaskRepository implements TaskRepository {
 
         } catch (IOException | ClassNotFoundException e) {
             System.out.println("No task file found. Starting fresh.");
+        }
+    }
+
+    private void loadTaskFromDB() {
+        String query = "SELECT id, title, due_date, status, user_email FROM tasks";
+        try (PreparedStatement stmt = _connection.prepareStatement(query);
+                ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                int id = rs.getInt("id");
+                String title = rs.getString("title");
+                String dueDate = rs.getString("due_date");
+                int taskStatusInt = rs.getInt("status");
+                TaskStatus taskStatus = TaskStatus.values()[taskStatusInt];
+                String email = rs.getString("user_email");
+                TaskItem taskItem = new TaskItem(id, title, dueDate, taskStatus, email);
+                _taskItems.add(taskItem);
+            }
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 }
